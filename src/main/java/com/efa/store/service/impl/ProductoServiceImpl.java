@@ -1,4 +1,4 @@
-package com.efa.store.service.imp;
+package com.efa.store.service.impl;
 
 import com.efa.store.entity.Producto;
 import com.efa.store.repository.ProductoRepository;
@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ProductoServiceImp {
+public class ProductoServiceImpl {
 
     //@Autowired
     private ProductoRepository productoRepository;
