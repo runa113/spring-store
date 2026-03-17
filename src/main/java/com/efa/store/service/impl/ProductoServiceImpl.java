@@ -5,7 +5,7 @@ import com.efa.store.repository.ProductoRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -15,11 +15,15 @@ public class ProductoServiceImpl {
     //@Autowired
     private ProductoRepository productoRepository;
 
-    public ArrayList<Producto> getAllProductos(){
+/*    public ArrayList<Producto> getAllProductos(){
         return (ArrayList<Producto>) productoRepository.findAll();
+    }*/
+
+    public List<Producto> getAllProductos(){
+        return productoRepository.findAll();
     }
 
-    public Optional<Producto> findById(Integer id) {
+    public Optional<Producto> findByIdWithOptional(Integer id) {
 
         try{
             Producto producto = productoRepository.findById(id)
@@ -33,6 +37,16 @@ public class ProductoServiceImpl {
 
     }
 
+    public boolean deleteProductoByIdWithOptional(Integer id) {
+        try {
+            Optional<Producto> u = findByIdWithOptional(id);
+            productoRepository.delete(u.get());
+            return true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
     public Producto saveProducto(Producto u) {
         return productoRepository.save(u);
     }
@@ -44,13 +58,14 @@ public class ProductoServiceImpl {
     }
     */
 
+    public Producto findById(Integer id) {
+        return productoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con id: " + id));
+    }
+
     public boolean deleteProductoById(Integer id) {
-        try {
-            Optional<Producto> u = findById(id);
-            productoRepository.delete(u.get());
-            return true;
-        }catch (Exception e){
-            return false;
-        }
+        Producto u = findById(id);
+        productoRepository.delete(u);
+        return true;
     }
 }
