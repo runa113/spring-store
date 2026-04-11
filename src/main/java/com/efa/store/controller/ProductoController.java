@@ -6,7 +6,7 @@ import com.efa.store.dto.RespuestaDTO;
 import com.efa.store.dto.utils.RespuestaServicioDto;
 import com.efa.store.entity.Producto;
 import com.efa.store.mapper.MapperGenericResponse;
-import com.efa.store.service.impl.ProductoServiceImpl;
+import com.efa.store.service.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +31,7 @@ import java.util.Optional;
 public class ProductoController {
 
     //@Autowired
-    private final ProductoServiceImpl productoServiceImp;
+    private final ProductoService productoService;
 
     private final ApiFake apiFake;
 
@@ -55,23 +55,23 @@ public class ProductoController {
 
     @GetMapping("/all")
     public List<Producto> getAllProductos(){
-        return productoServiceImp.getAllProductos();
+        return productoService.getAllProductos();
     }
 
     @GetMapping("/findConOptional/{id}")
     public Optional<Producto> findByIdConOptional(@PathVariable("id") Integer id){
-        return productoServiceImp.findByIdWithOptional(id);
+        return productoService.findByIdWithOptional(id);
     }
 
     @PostMapping("/save")
     public Producto saveProducto(@RequestBody Producto u) {
-        return productoServiceImp.saveProducto(u);
+        return productoService.saveProducto(u);
 
     }
 
     @DeleteMapping("/deleteWithOptional/{id}")
     public String deleteProductoByIdWithOptional(@PathVariable("id") Integer id) {
-        if(productoServiceImp.deleteProductoByIdWithOptional(id)) {
+        if(productoService.deleteProductoByIdWithOptional(id)) {
             return "Se ha eliminado el producto";
         }
         else {
@@ -81,12 +81,12 @@ public class ProductoController {
 
     @GetMapping("/find/{id}")
     public Producto getProductoById(@PathVariable("id") Integer id){
-        return productoServiceImp.findById(id);
+        return productoService.findById(id);
     }
 
     @DeleteMapping("/delete/{id}")
     public String deleteProductoById(@PathVariable("id") Integer id) {
-        if(productoServiceImp.deleteProductoById(id)) {
+        if(productoService.deleteProductoById(id)) {
             return "Se ha eliminado el producto";
         }
         else {
@@ -115,7 +115,7 @@ public class ProductoController {
     @GetMapping("/all2")
     public ResponseEntity<RespuestaServicioDto> consultarAllProductos(){
 
-        List<Producto> list = productoServiceImp.getAllProductos();
+        List<Producto> list = productoService.getAllProductos();
 
         return ResponseEntity.ok(MapperGenericResponse.ok("Productos obtenidos", list));
     }
