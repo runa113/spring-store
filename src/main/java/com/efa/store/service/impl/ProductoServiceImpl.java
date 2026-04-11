@@ -2,18 +2,19 @@ package com.efa.store.service.impl;
 
 import com.efa.store.entity.Producto;
 import com.efa.store.repository.ProductoRepository;
-import lombok.AllArgsConstructor;
+import com.efa.store.service.ProductoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
-public class ProductoServiceImpl {
+@RequiredArgsConstructor
+public class ProductoServiceImpl implements ProductoService {
 
     //@Autowired
-    private ProductoRepository productoRepository;
+    private final ProductoRepository productoRepository;
 
 /*    public ArrayList<Producto> getAllProductos(){
         return (ArrayList<Producto>) productoRepository.findAll();
