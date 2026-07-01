@@ -25,4 +25,6 @@ public interface ProductoAltaService {
     ProductoDTO actualizar(Integer id, ProductoRequest request);
 
     void eliminar(Integer id);
+
+    String obtenerExcelProductos();
 }

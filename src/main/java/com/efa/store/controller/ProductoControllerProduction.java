@@ -3,8 +3,11 @@ package com.efa.store.controller;
 import com.efa.store.dto.ProductoDTO;
 import com.efa.store.dto.request.ProductoRequest;
 import com.efa.store.dto.utils.RespuestaServicioDto;
+import com.efa.store.mapper.MapperGenericResponse;
 import com.efa.store.service.ProductoAltaService;
 import com.efa.store.service.ProductoService;
+import com.efa.store.service.utileria.UtileriaExcelService;
+import com.efa.store.util.Constantes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,22 +24,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @RestController
 //@RequestMapping("production/productos")
 public class ProductoControllerProduction {
 
-
-    private final ProductoService productoService;
     private final ProductoAltaService productoAltaService;
+    private final UtileriaExcelService utileriaExcel;
 
-    public ProductoControllerProduction(ProductoService productoService, ProductoAltaService productoAltaService) {
-        this.productoService = productoService;
+    public ProductoControllerProduction(ProductoService productoService, ProductoAltaService productoAltaService, UtileriaExcelService utileriaExcel) {
+
         this.productoAltaService = productoAltaService;
+        this.utileriaExcel = utileriaExcel;
     }
 
 
@@ -183,6 +189,68 @@ public class ProductoControllerProduction {
         productoAltaService.eliminar(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/reporteEstatico")
+    @Operation(summary = "Solicitud que obtiene el reporte de perfiles")
+    @ApiResponse(description = "Operación que obtiene el reporte de la bandeja de perfiles", responseCode = Constantes.HTTP_200_SUCCESS, content = {@Content(mediaType = Constantes.MEDIA_TYPE_JSON)})
+    @ApiResponse(responseCode = Constantes.HTTP_404_NOT_FOUND, description = Constantes.DESC_HTTP_404, content = @Content)
+    @ApiResponse(responseCode = Constantes.HTTP_500_INTERNAL_ERROR, description = Constantes.DESC_HTTP_500, content = @Content)
+
+    public ResponseEntity<RespuestaServicioDto> consultarEstatusSolicitud(){
+
+        // === 1️⃣ Crear lista principal de datos ===
+        List<LinkedHashMap<String, Object>> listData = new ArrayList<>();
+
+        // === 2️⃣ Crear primer registro ===
+        LinkedHashMap<String, Object> fila1 = new LinkedHashMap<>();
+        fila1.put("Id", 1);
+        fila1.put("Descripción", "Limón");
+        fila1.put("Precio", 30);
+
+        // === 3️⃣ Segundo registro ===
+        LinkedHashMap<String, Object> fila2 = new LinkedHashMap<>();
+        fila2.put("Id", 2);
+        fila2.put("Descripción", "Mandarina");
+        fila2.put("Precio", 20);
+
+        // === 3er registro ===
+        LinkedHashMap<String, Object> fila3 = new LinkedHashMap<>();
+        fila3.put("Id", 3);
+        fila3.put("Descripción", "Naranja");
+        fila3.put("Precio", 15);
+
+        // === 4️⃣ Agregar filas a la lista ===
+        listData.add(fila1);
+        listData.add(fila2);
+        listData.add(fila3);
+
+
+        List<List<String>> lista = new ArrayList<>();
+
+        lista.add(Constantes.CABECERA_PRINCIPAL_CATALOGO_REPORTE_PRODUCTOS);
+        lista.add(Constantes.CABECERA_REPORTE_PRODUCTOS);
+
+        String excel =  utileriaExcel.obtenerBandejaPerfiles(lista, listData, "Cítricos");
+
+        return ResponseEntity.ok(MapperGenericResponse.ok("Reporte generado",
+                excel));
+    }
+
+
+    @PostMapping(value = "/reporte", produces = {MediaType.APPLICATION_JSON_VALUE})
+    @Operation(summary = "Solicitud que obtiene el reporte de productos")
+    @ApiResponse(description = "Operación que obtiene el reporte de productos", responseCode = Constantes.HTTP_200_SUCCESS, content = {@Content(mediaType = Constantes.MEDIA_TYPE_JSON)})
+    @ApiResponse(responseCode = Constantes.HTTP_404_NOT_FOUND, description = Constantes.DESC_HTTP_404, content = @Content)
+    @ApiResponse(responseCode = Constantes.HTTP_500_INTERNAL_ERROR, description = Constantes.DESC_HTTP_500, content = @Content)
+
+    public ResponseEntity<RespuestaServicioDto> consultarEstatusSolicitud(
+            //@RequestParam(required = false) String "Ejemplo",
+            @RequestBody ProductoRequest filtros
+    ){
+        String excel = productoAltaService.obtenerExcelProductos();
+        return ResponseEntity.ok(MapperGenericResponse.ok("Reporte generado",
+                excel));
     }
 
 }
