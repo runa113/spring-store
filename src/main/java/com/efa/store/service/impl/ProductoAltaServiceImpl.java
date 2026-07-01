@@ -1,12 +1,14 @@
 package com.efa.store.service.impl;
 
 import com.efa.store.dto.ProductoDTO;
+import com.efa.store.dto.request.ProductoRequest;
 import com.efa.store.entity.Producto;
 import com.efa.store.exception.ResourceNotFoundException;
 import com.efa.store.mapper.ProductoMapper;
 import com.efa.store.repository.ProductoAltaRepository;
 import com.efa.store.repository.ProductoRepository;
 import com.efa.store.service.ProductoAltaService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -102,6 +104,56 @@ public class ProductoAltaServiceImpl implements ProductoAltaService {
                 .stream()
                 .map(productoMapper::toResponse)
                 .toList();
+    }
+
+    @Override
+    public ProductoDTO guardar(ProductoRequest request) {
+
+        Producto producto = productoMapper.toEntity(request);
+
+        Producto guardado = productoRepository.save(producto);
+
+        return productoMapper.toDTO(guardado);
+    }
+
+
+    @Override
+    @Transactional
+    public void guardarVoid(ProductoRequest request) {
+
+        Producto producto = Producto.builder()
+                .descripcion(request.getDescripcion())
+                .precio(request.getPrecio())
+                .build();
+
+        productoRepository.save(producto);
+    }
+
+
+    @Override
+    public ProductoDTO actualizar(Integer id, ProductoRequest request) {
+
+        Producto producto = productoRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No se encontró el producto"));
+
+        producto.setDescripcion(request.getDescripcion());
+        producto.setPrecio(request.getPrecio());
+
+        Producto actualizado = productoRepository.save(producto);
+
+        return productoMapper.toDTO(actualizado);
+    }
+
+    @Override
+    @Transactional
+    public void eliminar(Integer id) {
+
+        Producto producto = productoAltaRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("No se encontró el producto"));
+
+        productoAltaRepository.delete(producto);
     }
 
 }
