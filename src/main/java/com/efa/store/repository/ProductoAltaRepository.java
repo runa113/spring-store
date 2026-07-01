@@ -44,4 +44,13 @@ public interface ProductoAltaRepository extends JpaRepository<Producto, Integer>
     """)
     List<ProductoProjection> obtenerTodosProjection();
 
+    @Query("""
+        SELECT
+            p.id AS id,
+            p.descripcion AS descripcion,
+            p.precio AS precio
+        FROM Producto p
+    """)
+    List<ProductoProjection> obtenerTodosProjectionExel();
+
 }

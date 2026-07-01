@@ -8,16 +8,22 @@ import com.efa.store.mapper.ProductoMapper;
 import com.efa.store.repository.ProductoAltaRepository;
 import com.efa.store.repository.ProductoRepository;
 import com.efa.store.service.ProductoAltaService;
+import com.efa.store.service.utileria.UtileriaExcelService;
+import com.efa.store.util.Constantes;
+import com.efa.store.util.MapperGenerico;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ProductoAltaServiceImpl implements ProductoAltaService {
 
+    private final UtileriaExcelService utileriaExcel;
     private final ProductoRepository productoRepository;
     private final ProductoAltaRepository productoAltaRepository;
 
@@ -154,6 +160,25 @@ public class ProductoAltaServiceImpl implements ProductoAltaService {
                         new ResourceNotFoundException("No se encontró el producto"));
 
         productoAltaRepository.delete(producto);
+    }
+
+    @Override
+    public String obtenerExcelProductos() {
+
+        String nombreLibro = "Lista productos";
+        List<ProductoDTO> listProductoDto = MapperGenerico.mapDTOEntityList(
+                productoAltaRepository.obtenerTodosProjectionExel(), ProductoDTO.class);
+
+        List<LinkedHashMap<String, Object>> listData = MapperGenerico.mapDTO(listProductoDto);
+
+
+
+        List<List<String>> lista = new ArrayList<>();
+        lista.add(Constantes.CABECERA_PRINCIPAL_CATALOGO_REPORTE_PRODUCTOS);
+        lista.add(Constantes.CABECERA_REPORTE_PRODUCTOS);
+
+        return utileriaExcel.obtenerBandejaPerfiles(lista, listData, nombreLibro);
+
     }
 
 }
